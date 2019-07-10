@@ -1,0 +1,6 @@
+numpy 
+opencv-contrib-python
+Pillow
+tqdm
+tensorflow
+keras
