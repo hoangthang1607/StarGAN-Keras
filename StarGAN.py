@@ -18,8 +18,10 @@ from keras import backend as K
 
 class RandomWeightedAverage(_Merge):
     """Provides a (random) weighted average between real and generated image samples"""
+    def define_batch_size(self, bs):
+        self.bs = bs
     def _merge_function(self, inputs):
-        alpha = K.random_uniform((4, 1, 1, 1))
+        alpha = K.random_uniform((self.bs, 1, 1, 1))
         return (alpha * inputs[0]) + ((1 - alpha) * inputs[1])
 
 class StarGAN(object):
@@ -190,7 +192,9 @@ class StarGAN(object):
         out_src_fake, out_cls_fake = self.D(x_fake)
 
         # Compute output for gradient penalty.
-        x_hat = RandomWeightedAverage()([x_real, x_fake])
+        rd_avg = RandomWeightedAverage()
+        rd_avg.define_batch_size(self.batch_size)
+        x_hat = rd_avg([x_real, x_fake])
         out_src, _ = self.D(x_hat)
             
         # Use Python partial to provide loss function with additional 'averaged_samples' argument
