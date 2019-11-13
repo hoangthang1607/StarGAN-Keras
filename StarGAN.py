@@ -276,7 +276,7 @@ class StarGAN(object):
         else:
             self.G.load_weights(G_weights_dir)
 
-        data_iter = get_loader(self.Image_data_class.test_dataset, self.Image_data_class.train_dataset_label, self.Image_data_class.train_dataset_fix_label, 
+        data_iter = get_loader(self.Image_data_class.test_dataset, self.Image_data_class.test_dataset_label, self.Image_data_class.test_dataset_fix_label, 
                                image_size=self.image_size, batch_size=self.batch_size, mode=self.mode)        
         n_batches = int(len(self.sample_step) / self.batch_size)
         total_samples = n_batches * self.batch_size
