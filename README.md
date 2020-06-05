@@ -18,7 +18,7 @@ $ bash download.sh celeba
 * python main.py --mode custom --custom_image_name <000001.jpg... name of your image> --custom_image_label <1 0 0 1 1... 5 original labels of your image>
 
 ### Pretrained model
-* Download [G_weights.hdf5](https://drive.google.com/file/d/16n6yeQbQh4hOgobXspTU5dwEbLtnlk45/view?usp=sharing) and put into './models' directory.
+* Download [G_weights.hdf5](https://drive.google.com/file/d/1d0KwOBmQgnyH3WgQ7qw_q2hZupqFp1gZ/view?usp=sharing) and put into './models' directory.
 
 ## Summary
 ![overview](./assests/overview.PNG)
