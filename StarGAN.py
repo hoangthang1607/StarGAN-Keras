@@ -13,8 +13,14 @@ from keras.layers.merge import _Merge
 from keras.layers import Input, Conv2D, MaxPooling2D, ZeroPadding2D, Conv2D, BatchNormalization, LeakyReLU, ReLU, UpSampling2D
 from keras.layers import Reshape, Dropout, Concatenate, Lambda, Multiply, Add, Flatten, Dense
 from keras_contrib.layers.normalization.instancenormalization import InstanceNormalization
-from keras.optimizers import Adam
+# from keras.optimizers import Adam
 from keras import backend as K
+
+
+from tensorflow.python.framework.ops import disable_eager_execution
+# disabling eager execution means that the into to float cannot be cast
+# enabling eager execution means Adam optimizer does not work :@
+disable_eager_execution()
 
 class RandomWeightedAverage(_Merge):
     """Provides a (random) weighted average between real and generated image samples"""
@@ -205,9 +211,10 @@ class StarGAN(object):
         self.train_D = Model([x_real, label_trg], [out_src_real, out_cls_real, out_src_fake, out_src])
 
         # Setup loss for train_D
-        self.train_D.compile(loss = [self.wasserstein_loss, self.classification_loss, self.wasserstein_loss, partial_gp_loss], 
-                             optimizer=Adam(lr = self.d_lr, beta_1 = self.beta1, beta_2 = self.beta2), loss_weights = [1, self.lambda_cls, 1, self.lambda_gp])
+        self.train_D.compile(loss = [self.wasserstein_loss, self.classification_loss, self.wasserstein_loss, partial_gp_loss],
+                             optimizer=tf.compat.v1.train.AdamOptimizer( learning_rate = self.d_lr, beta1 = self.beta1, beta2 = self.beta2), loss_weights = [1, self.lambda_cls, 1, self.lambda_gp])
 
+        init = tf.compat.v1.global_variables_initializer()
         # Update G and not update D
         self.G.trainable = True
         self.D.trainable = False
@@ -229,7 +236,7 @@ class StarGAN(object):
 
         # Setup loss for train_G
         self.train_G.compile(loss = [self.wasserstein_loss, self.classification_loss, self.reconstruction_loss], 
-                             optimizer=Adam(lr = self.g_lr, beta_1 = self.beta1, beta_2 = self.beta2), loss_weights = [1, self.lambda_cls, self.lambda_rec])
+                             optimizer=tf.compat.v1.train.AdamOptimizer( learning_rate = self.g_lr, beta1 = self.beta1, beta2 = self.beta2), loss_weights = [1, self.lambda_cls, self.lambda_rec])
         
         """ Input Image"""
         self.Image_data_class = ImageData(data_dir=self.data_dir, selected_attrs=self.selected_attrs)
@@ -253,7 +260,7 @@ class StarGAN(object):
     
             # Training Discriminators        
             D_loss = self.train_D.train_on_batch(x = [imgs, target_labels], y = [valid, orig_labels, fake, dummy])
-        
+            self.train_D.train_on_batch(s)
             # Training Generators
             if (epoch + 1) % self.n_critic == 0:
                 G_loss = self.train_G.train_on_batch(x = [imgs, orig_labels, target_labels], y = [valid, target_labels, imgs])
@@ -303,4 +310,4 @@ class StarGAN(object):
         image = np.array([image])/127.5 - 1
         preds = self.G.predict([np.repeat(image, len(self.selected_attrs), axis = 0), target_list])
         for k in range(len(self.selected_attrs)):                    
-            Image.fromarray((preds[k]*127.5 + 127.5).astype(np.uint8)).save(os.path.join(self.sample_dir, self.custom_image_name.split('.')[0] + f'_{k + 1}.png'))        
+            Image.fromarray((preds[k]*127.5 + 127.5).astype(np.uint8)).save(os.path.join(self.sample_dir, self.custom_image_name.split('.')[0] + f'_{k + 1}.png'))
