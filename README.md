@@ -12,6 +12,12 @@ Numpy: 1.20.3 (also tried 1.19.2)
 Python: 3.8.5
 OS: Ubuntu 20.04 LTS
 ```
+The training works on the following nvidia drivers:
+```
+NVIDIA Driver Version: 465.19.01
+CUDA Version: 11.3
+cuDNN Version: 8.1.1
+```
 
 ## Note:
 The porting right now disables eager_execution() keeping the original code as is. Otherwise, the labels will have to be updated to the new Tensorflow tensors instead of lists. Furthermore, Adam optimizer is used using the tf.compat.v1 method.
