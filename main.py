@@ -38,7 +38,7 @@ def parse_args():
     parser.add_argument('--mode', type=str, default='train', choices=['train', 'test', 'custom'])
 
     # Directories.
-    parser.add_argument('--data_dir', type=str, default='data/celeba')
+    parser.add_argument('--data_dir', type=str, default='/home/atif/Documents/Datasets/celeba')
     parser.add_argument('--model_save_dir', type=str, default='models')
     parser.add_argument('--sample_dir', type=str, default='samples')
     parser.add_argument('--result_dir', type=str, default='results')
